@@ -24,6 +24,15 @@ describe("ago", () => {
   it("returns minutes for < 1h", () => {
     expect(ago(Date.now() - 5 * 60 * 1000)).toBe("5分前");
   });
+  it("returns hours for < 24h", () => {
+    expect(ago(Date.now() - 3 * 3600 * 1000)).toBe("3時間前");
+  });
+  it("returns days for < 7d", () => {
+    expect(ago(Date.now() - 3 * 24 * 3600 * 1000)).toBe("3日前");
+  });
+  it("returns weeks for >= 7d", () => {
+    expect(ago(Date.now() - 14 * 24 * 3600 * 1000)).toBe("2週間前");
+  });
 });
 
 describe("uid", () => {

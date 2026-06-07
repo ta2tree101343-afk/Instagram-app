@@ -4,7 +4,7 @@ export interface Comment {
   text: string;
 }
 
-export interface PostUser {
+export interface AppUser {
   username: string;
   avatar: string;
   verified: boolean;
@@ -14,7 +14,7 @@ export interface Post {
   id: string;
   inFeed: boolean;
   mine: boolean;
-  user: PostUser;
+  user: AppUser;
   image: string;
   fallback: string;
   video?: string;
@@ -41,15 +41,9 @@ export interface Message {
   at: number;
 }
 
-export interface ConvUser {
-  username: string;
-  avatar: string;
-  verified: boolean;
-}
-
 export interface Conversation {
   id: string;
-  user: ConvUser;
+  user: AppUser;
   online: boolean;
   unread: number;
   messages: Message[];
