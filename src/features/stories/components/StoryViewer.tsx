@@ -45,8 +45,8 @@ export function StoryViewer({ stories, index, onClose, onSeen }: StoryViewerProp
           <img src={s.avatar} alt="" /><b>{s.username}</b>
           <span className="t">{(i + 1) * 2}時間前</span>
         </div>
-        <div className="sv-tap l" onClick={prev} />
-        <div className="sv-tap r" onClick={next} />
+        <button className="sv-tap l" aria-label="前の投稿" onClick={prev} />
+        <button className="sv-tap r" aria-label="次の投稿" onClick={next} />
       </div>
     </div>
   );
