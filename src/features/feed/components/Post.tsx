@@ -2,8 +2,7 @@
 import { useState } from "react";
 import { Heart, MessageCircle, Send, Bookmark, MoreHorizontal, BadgeCheck, Smile } from "lucide-react";
 import type { Post as PostType } from "@/shared/types";
-import { Media } from "@/shared/components/media";
-import { VideoBox } from "@/shared/components/media";
+import { Media, VideoBox } from "@/shared/components/media";
 import { fmt, ago } from "@/shared/utils";
 
 interface PostProps {
@@ -32,7 +31,7 @@ export function Post({ p, onLike, onSave, onComment, onOpen, onToast }: PostProp
       </div>
       <div className="post-img-wrap" onDoubleClick={dbl} style={{ cursor: "pointer" }}>
         {p.video
-          ? <VideoBox src={p.video} poster={p.image} onDoubleClick={dbl} />
+          ? <VideoBox src={p.video} poster={p.image} />
           : <Media src={p.image} fallback={p.fallback} onClick={() => onOpen(p.id)} />}
         <div className={"big-heart" + (heart ? " show" : "")} key={heart}>
           <Heart size={96} fill="#fff" color="#fff" />
@@ -52,7 +51,7 @@ export function Post({ p, onLike, onSave, onComment, onOpen, onToast }: PostProp
       <div className="likes">いいね！{fmt(p.likes)}件</div>
       <div className="caption"><b>{p.user.username}</b> {p.caption}</div>
       {p.comments.length > 0 && (
-        <div className="cm-link" onClick={() => onOpen(p.id)}>コメント{p.comments.length}件をすべて見る</div>
+        <button className="cm-link" onClick={() => onOpen(p.id)}>コメント{p.comments.length}件をすべて見る</button>
       )}
       {p.comments.slice(0, 2).map((c) => (
         <div className="cm-prev" key={c.id}><b>{c.user}</b> {c.text}</div>

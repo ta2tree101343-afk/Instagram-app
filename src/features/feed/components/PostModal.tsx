@@ -19,7 +19,7 @@ export function PostModal({ p, onClose, onLike, onSave, onComment, onToast }: Po
   const send = () => { if (!text.trim()) return; onComment(p.id, text.trim()); setText(""); };
   return (
     <div className="overlay" onClick={onClose}>
-      <button className="close" onClick={onClose}><X size={28} /></button>
+      <button className="close" onClick={(e) => { e.stopPropagation(); onClose(); }}><X size={28} /></button>
       <div className="pm" onClick={(e) => e.stopPropagation()}>
         <div className="pm-img">
           {p.video
@@ -36,12 +36,12 @@ export function PostModal({ p, onClose, onLike, onSave, onComment, onToast }: Po
           <div className="pm-comments">
             <div className="cm-row">
               <img src={p.user.avatar} alt="" />
-              <div><b>{p.user.username}</b>{p.caption}</div>
+              <div><b>{p.user.username}</b> {p.caption}</div>
             </div>
             {p.comments.map((c) => (
               <div className="cm-row" key={c.id}>
                 <img src={`https://i.pravatar.cc/100?u=${c.user}`} alt="" />
-                <div><b>{c.user}</b>{c.text}</div>
+                <div><b>{c.user}</b> {c.text}</div>
               </div>
             ))}
             {p.comments.length === 0 && (
