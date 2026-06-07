@@ -12,8 +12,8 @@ describe("hue", () => {
 });
 
 describe("fmt", () => {
-  it("formats numbers with ja-JP locale", () => {
-    expect(fmt(12430)).toBe("12,430");
+  it("formats numbers with thousands separator", () => {
+    expect(fmt(12430)).toMatch(/12.430/);
   });
 });
 

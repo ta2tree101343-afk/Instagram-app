@@ -1,7 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import type { Conversation } from "@/shared/types";
 import { seedConversations } from "@/shared/data/seeds";
-import { uid } from "@/shared/utils";
 
 interface MessagesState {
   conversations: Conversation[];
@@ -26,13 +25,13 @@ export const messagesSlice = createSlice({
         if (c) c.unread = 0;
       }
     },
-    sendMessage(state, action: PayloadAction<{ convId: string; text: string }>) {
+    sendMessage(state, action: PayloadAction<{ convId: string; text: string; id: string; at: number }>) {
       const c = state.conversations.find((c) => c.id === action.payload.convId);
-      if (c) c.messages.push({ id: uid(), fromMe: true, text: action.payload.text, at: Date.now() });
+      if (c) c.messages.push({ id: action.payload.id, fromMe: true, text: action.payload.text, at: action.payload.at });
     },
-    receiveReply(state, action: PayloadAction<{ convId: string; text: string }>) {
+    receiveReply(state, action: PayloadAction<{ convId: string; text: string; id: string; at: number }>) {
       const c = state.conversations.find((c) => c.id === action.payload.convId);
-      if (c) c.messages.push({ id: uid(), fromMe: false, text: action.payload.text, at: Date.now() });
+      if (c) c.messages.push({ id: action.payload.id, fromMe: false, text: action.payload.text, at: action.payload.at });
     },
     setTyping(state, action: PayloadAction<string | null>) {
       state.typingConv = action.payload;

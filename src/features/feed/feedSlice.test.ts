@@ -1,4 +1,4 @@
-import feedReducer, { like, save, comment, setOpenId } from "./feedSlice";
+import feedReducer, { like, save, comment, create, setOpenId, hydrateFeed } from "./feedSlice";
 import type { Post } from "@/shared/types";
 
 const basePost: Post = {
@@ -32,14 +32,31 @@ describe("feedSlice", () => {
 
   it("comment appends a comment", () => {
     const state = { posts: [basePost], openId: null };
-    const next = feedReducer(state, comment({ id: "p1", text: "hi", username: "bob" }));
+    const next = feedReducer(state, comment({ id: "p1", text: "hi", username: "bob", commentId: "c1" }));
     expect(next.posts[0].comments).toHaveLength(1);
     expect(next.posts[0].comments[0].text).toBe("hi");
+    expect(next.posts[0].comments[0].id).toBe("c1");
+  });
+
+  it("create prepends a new post using payload id and at", () => {
+    const state = { posts: [], openId: null };
+    const next = feedReducer(state, create({ id: "new1", at: 9999, image: "img.jpg", caption: "test" }));
+    expect(next.posts).toHaveLength(1);
+    expect(next.posts[0].id).toBe("new1");
+    expect(next.posts[0].createdAt).toBe(9999);
+    expect(next.posts[0].caption).toBe("test");
+    expect(next.posts[0].mine).toBe(true);
   });
 
   it("setOpenId updates openId", () => {
     const state = { posts: [], openId: null };
     const next = feedReducer(state, setOpenId("p1"));
     expect(next.openId).toBe("p1");
+  });
+
+  it("hydrateFeed replaces posts", () => {
+    const state = { posts: [basePost], openId: null };
+    const next = feedReducer(state, hydrateFeed([]));
+    expect(next.posts).toHaveLength(0);
   });
 });
