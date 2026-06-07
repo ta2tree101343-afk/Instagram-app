@@ -3,10 +3,10 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Heart, Sun, Moon, Send } from "lucide-react";
 import type { RootState, AppDispatch } from "./store";
-import type { ViewKey } from "@/shared/types";
-import { like, save, comment, create, setOpenId } from "@/features/feed/feedSlice";
-import { markSeen, setViewerIndex } from "@/features/stories/storiesSlice";
-import { openConv, sendMessage, receiveReply, setTyping } from "@/features/messages/messagesSlice";
+import type { ViewKey, Post, Story, Conversation } from "@/shared/types";
+import { like, save, comment, create, setOpenId, hydrateFeed } from "@/features/feed/feedSlice";
+import { markSeen, setViewerIndex, hydrateStories } from "@/features/stories/storiesSlice";
+import { openConv, sendMessage, receiveReply, setTyping, hydrateMessages } from "@/features/messages/messagesSlice";
 import { setTab, incrementPosts } from "@/features/profile/profileSlice";
 import { loadState, saveState } from "@/shared/lib/storage";
 import { cannedReplies } from "@/shared/data/seeds";
@@ -50,10 +50,15 @@ export default function App() {
 
   useEffect(() => {
     (async () => {
-      await loadState();
+      const saved = await loadState();
+      if (saved) {
+        if (Array.isArray(saved.posts)) dispatch(hydrateFeed(saved.posts as Post[]));
+        if (Array.isArray(saved.stories)) dispatch(hydrateStories(saved.stories as Story[]));
+        if (Array.isArray(saved.conversations)) dispatch(hydrateMessages(saved.conversations as Conversation[]));
+      }
       setLoaded(true);
     })();
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     if (!loaded) return;
@@ -67,23 +72,23 @@ export default function App() {
     toastTimer.current = setTimeout(() => setToast(null), 1800);
   }, []);
 
-  const onLike = (id: string, liked: boolean) => dispatch(like({ id, liked }));
-  const onSave = (id: string, saved: boolean) => {
+  const onLike = useCallback((id: string, liked: boolean) => dispatch(like({ id, liked })), [dispatch]);
+  const onSave = useCallback((id: string, saved: boolean) => {
     dispatch(save({ id, saved }));
     showToast(saved ? "保存しました" : "保存を解除しました");
-  };
-  const onComment = (id: string, text: string) =>
-    dispatch(comment({ id, text, username: profile.username, commentId: uid() }));
+  }, [dispatch, showToast]);
+  const onComment = useCallback((id: string, text: string) =>
+    dispatch(comment({ id, text, username: profile.username, commentId: uid() })), [dispatch, profile.username]);
 
-  const handleCreate = (image: string, caption: string) => {
+  const handleCreate = useCallback((image: string, caption: string) => {
     dispatch(create({ image, caption, id: uid(), at: Date.now() }));
     dispatch(incrementPosts());
     setCreateOpen(false);
     setView("home");
     showToast("投稿をシェアしました 🎉");
-  };
+  }, [dispatch, showToast]);
 
-  const handleSendDM = (convId: string, text: string) => {
+  const handleSendDM = useCallback((convId: string, text: string) => {
     dispatch(sendMessage({ convId, text, id: uid(), at: Date.now() }));
     dispatch(setTyping(convId));
     setTimeout(() => {
@@ -91,7 +96,7 @@ export default function App() {
       dispatch(receiveReply({ convId, text: reply, id: uid(), at: Date.now() }));
       dispatch(setTyping(null));
     }, 1500);
-  };
+  }, [dispatch]);
 
   const openPost = posts.find((p) => p.id === openId) ?? null;
   const unreadTotal = conversations.reduce((s, c) => s + c.unread, 0);
