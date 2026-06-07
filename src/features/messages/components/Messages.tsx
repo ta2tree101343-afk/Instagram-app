@@ -34,7 +34,7 @@ export function Messages({ conversations, activeId, openConv, onSend, typingConv
       <div className="dm-list">
         <div className="dm-list-head">
           <div className="me">{ME.username}{ME.verified && <BadgeCheck size={16} className="v" fill="var(--accent)" color="#fff" />}</div>
-          <button><PenSquare /></button>
+          <button aria-label="新規メッセージ作成"><PenSquare /></button>
         </div>
         <div style={{ padding: "0 18px 10px", fontWeight: 700, fontSize: 15 }}>
           メッセージ{total > 0 && <span style={{ color: "var(--muted)", fontWeight: 400 }}>（未読 {total}）</span>}
@@ -42,6 +42,7 @@ export function Messages({ conversations, activeId, openConv, onSend, typingConv
         <div className="dm-convs">
           {conversations.map((c) => {
             const last = c.messages[c.messages.length - 1];
+            if (!last) return null;
             return (
               <button key={c.id} className={"conv" + (c.id === activeId ? " active" : "")} onClick={() => openConv(c.id)}>
                 <div className="av-wrap">
@@ -65,7 +66,7 @@ export function Messages({ conversations, activeId, openConv, onSend, typingConv
         {active ? (
           <>
             <div className="dm-thread-head">
-              <button className="back" onClick={() => openConv(null)}><ChevronLeft size={26} /></button>
+              <button className="back" aria-label="戻る" onClick={() => openConv(null)}><ChevronLeft size={26} /></button>
               <img src={active.user.avatar} alt="" />
               <div>
                 <div className="th-name">{active.user.username}{active.user.verified && <BadgeCheck size={14} className="v" fill="var(--accent)" color="#fff" />}</div>
@@ -93,7 +94,7 @@ export function Messages({ conversations, activeId, openConv, onSend, typingConv
             <div className="dm-input">
               <Smile size={24} color="var(--muted)" />
               <input value={text} onChange={(e) => setText(e.target.value)}
-                placeholder="メッセージを送信…" onKeyDown={(e) => e.key === "Enter" && send()} />
+                placeholder="メッセージを送信…" aria-label="メッセージを入力" onKeyDown={(e) => e.key === "Enter" && send()} />
               {text.trim() ? <button className="snd" onClick={send}>送信</button> : <Send size={22} color="var(--accent)" />}
             </div>
           </>

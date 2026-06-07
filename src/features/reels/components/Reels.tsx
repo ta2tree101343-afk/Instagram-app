@@ -62,8 +62,8 @@ export function Reels({ posts, onLike, onToast }: ReelsProps) {
                 {fmt(p.likes)}
               </button>
               <div className="ri"><MessageCircle size={28} />{p.comments.length}</div>
-              <button className="ri" onClick={() => onToast("シェアしました")}><Send size={26} /></button>
-              <button className="ri" onClick={() => onToast("オプション準備中")}><MoreHorizontal size={26} /></button>
+              <button className="ri" aria-label="シェア" onClick={() => onToast("シェアしました")}><Send size={26} /></button>
+              <button className="ri" aria-label="オプション" onClick={() => onToast("オプション準備中")}><MoreHorizontal size={26} /></button>
             </div>
           </div>
         </div>
