@@ -1,12 +1,10 @@
 // src/features/feed/components/Feed.tsx
-import type { Post as PostType, Story } from "@/shared/types";
-import { Stories } from "@/features/stories/components/Stories";
+import type { Post as PostType } from "@/shared/types";
 import { Post } from "./Post";
 
 interface FeedProps {
+  header?: React.ReactNode;
   posts: PostType[];
-  stories: Story[];
-  onOpenStory: (index: number) => void;
   onLike: (id: string, liked: boolean) => void;
   onSave: (id: string, saved: boolean) => void;
   onComment: (id: string, text: string) => void;
@@ -14,11 +12,11 @@ interface FeedProps {
   onToast: (msg: string) => void;
 }
 
-export function Feed({ posts, stories, onOpenStory, ...handlers }: FeedProps) {
+export function Feed({ header, posts, ...handlers }: FeedProps) {
   const feed = posts.filter((p) => p.inFeed);
   return (
     <div className="center">
-      <Stories stories={stories} onOpen={onOpenStory} />
+      {header}
       {feed.map((p) => <Post key={p.id} p={p} {...handlers} />)}
     </div>
   );

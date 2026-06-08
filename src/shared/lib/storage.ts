@@ -8,7 +8,8 @@ export async function loadState(): Promise<Record<string, unknown> | null> {
     }
     const raw = localStorage.getItem(STORE_KEY);
     return raw ? (JSON.parse(raw) as Record<string, unknown>) : null;
-  } catch {
+  } catch (err) {
+    console.error("[storage] loadState failed — returning null", err);
     return null;
   }
 }
@@ -20,7 +21,7 @@ export async function saveState(data: Record<string, unknown>): Promise<void> {
       return;
     }
     localStorage.setItem(STORE_KEY, JSON.stringify(data));
-  } catch {
-    // storage errors are non-fatal
+  } catch (err) {
+    console.error("[storage] saveState failed — state was NOT persisted", err);
   }
 }

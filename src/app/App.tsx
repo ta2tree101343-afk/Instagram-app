@@ -18,6 +18,7 @@ import { Reels } from "@/features/reels/components/Reels";
 import { Messages } from "@/features/messages/components/Messages";
 import { PostModal } from "@/features/feed/components/PostModal";
 import { CreateModal } from "@/features/feed/components/CreateModal";
+import { Stories } from "@/features/stories/components/Stories";
 import { StoryViewer } from "@/features/stories/components/StoryViewer";
 import { Sidebar } from "@/shared/components/layout/Sidebar";
 import { MobileNav } from "@/shared/components/layout/MobileNav";
@@ -50,13 +51,18 @@ export default function App() {
 
   useEffect(() => {
     (async () => {
-      const saved = await loadState();
-      if (saved) {
-        if (Array.isArray(saved.posts)) dispatch(hydrateFeed(saved.posts as Post[]));
-        if (Array.isArray(saved.stories)) dispatch(hydrateStories(saved.stories as Story[]));
-        if (Array.isArray(saved.conversations)) dispatch(hydrateMessages(saved.conversations as Conversation[]));
+      try {
+        const saved = await loadState();
+        if (saved) {
+          if (Array.isArray(saved.posts)) dispatch(hydrateFeed(saved.posts as Post[]));
+          if (Array.isArray(saved.stories)) dispatch(hydrateStories(saved.stories as Story[]));
+          if (Array.isArray(saved.conversations)) dispatch(hydrateMessages(saved.conversations as Conversation[]));
+        }
+      } catch (err) {
+        console.error("[App] Failed to hydrate state from storage", err);
+      } finally {
+        setLoaded(true);
       }
-      setLoaded(true);
     })();
   }, [dispatch]);
 
@@ -122,8 +128,9 @@ export default function App() {
         </div>
 
         {view === "home" && (
-          <Feed posts={posts} stories={stories}
-            onOpenStory={(i) => dispatch(setViewerIndex(i))}
+          <Feed
+            header={<Stories stories={stories} onOpen={(i) => dispatch(setViewerIndex(i))} />}
+            posts={posts}
             onLike={onLike} onSave={onSave} onComment={onComment}
             onOpen={(id) => dispatch(setOpenId(id))} onToast={showToast} />
         )}
