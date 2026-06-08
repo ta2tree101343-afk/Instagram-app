@@ -24,7 +24,10 @@ export function Reels({ posts, onLike, onToast }: ReelsProps) {
     const io = new IntersectionObserver((entries) => {
       entries.forEach((e) => {
         const v = e.target as HTMLVideoElement;
-        if (e.isIntersecting && e.intersectionRatio > 0.6) v.play().catch(() => {});
+        if (e.isIntersecting && e.intersectionRatio > 0.6) v.play().catch((err: unknown) => {
+          if (err instanceof DOMException && err.name === "AbortError") return;
+          console.error("[Reels] video.play() failed", err);
+        });
         else v.pause();
       });
     }, { threshold: [0, 0.6, 1] });

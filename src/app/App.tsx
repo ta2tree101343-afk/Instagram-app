@@ -1,13 +1,12 @@
 // src/app/App.tsx
 import { useState, useEffect, useRef, useCallback } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { Heart, Sun, Moon, Send } from "lucide-react";
-import type { RootState, AppDispatch } from "./store";
+import { useAppDispatch, useAppSelector } from "./store";
 import type { ViewKey, Post, Story, Conversation } from "@/shared/types";
 import { like, save, comment, create, setOpenId, hydrateFeed } from "@/features/feed/feedSlice";
 import { markSeen, setViewerIndex, hydrateStories } from "@/features/stories/storiesSlice";
 import { openConv, sendMessage, receiveReply, setTyping, hydrateMessages } from "@/features/messages/messagesSlice";
-import { setTab, incrementPosts } from "@/features/profile/profileSlice";
+import { setTab } from "@/features/profile/profileSlice";
 import { loadState, saveState } from "@/shared/lib/storage";
 import { cannedReplies } from "@/shared/data/seeds";
 import { uid } from "@/shared/utils";
@@ -24,16 +23,16 @@ import { Sidebar } from "@/shared/components/layout/Sidebar";
 import { MobileNav } from "@/shared/components/layout/MobileNav";
 
 export default function App() {
-  const dispatch = useDispatch<AppDispatch>();
-  const posts = useSelector((s: RootState) => s.feed.posts);
-  const openId = useSelector((s: RootState) => s.feed.openId);
-  const stories = useSelector((s: RootState) => s.stories.items);
-  const storyIdx = useSelector((s: RootState) => s.stories.viewerIndex);
-  const conversations = useSelector((s: RootState) => s.messages.conversations);
-  const activeConv = useSelector((s: RootState) => s.messages.activeId);
-  const typingConv = useSelector((s: RootState) => s.messages.typingConv);
-  const profile = useSelector((s: RootState) => s.profile.profile);
-  const tab = useSelector((s: RootState) => s.profile.tab);
+  const dispatch = useAppDispatch();
+  const posts = useAppSelector((s) => s.feed.posts);
+  const openId = useAppSelector((s) => s.feed.openId);
+  const stories = useAppSelector((s) => s.stories.items);
+  const storyIdx = useAppSelector((s) => s.stories.viewerIndex);
+  const conversations = useAppSelector((s) => s.messages.conversations);
+  const activeConv = useAppSelector((s) => s.messages.activeId);
+  const typingConv = useAppSelector((s) => s.messages.typingConv);
+  const profile = useAppSelector((s) => s.profile.profile);
+  const tab = useAppSelector((s) => s.profile.tab);
 
   const [dark, setDark] = useState(false);
   const [view, setView] = useState<ViewKey>("home");
@@ -41,6 +40,7 @@ export default function App() {
   const [toast, setToast] = useState<string | null>(null);
   const [loaded, setLoaded] = useState(false);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const dmReplyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const l = document.createElement("link");
@@ -72,6 +72,12 @@ export default function App() {
     return () => clearTimeout(t);
   }, [posts, stories, conversations, loaded]);
 
+  useEffect(() => {
+    return () => {
+      if (dmReplyTimer.current) clearTimeout(dmReplyTimer.current);
+    };
+  }, []);
+
   const showToast = useCallback((msg: string) => {
     setToast(msg);
     if (toastTimer.current) clearTimeout(toastTimer.current);
@@ -88,7 +94,6 @@ export default function App() {
 
   const handleCreate = useCallback((image: string, caption: string) => {
     dispatch(create({ image, caption, id: uid(), at: Date.now() }));
-    dispatch(incrementPosts());
     setCreateOpen(false);
     setView("home");
     showToast("投稿をシェアしました 🎉");
@@ -97,7 +102,8 @@ export default function App() {
   const handleSendDM = useCallback((convId: string, text: string) => {
     dispatch(sendMessage({ convId, text, id: uid(), at: Date.now() }));
     dispatch(setTyping(convId));
-    setTimeout(() => {
+    if (dmReplyTimer.current) clearTimeout(dmReplyTimer.current);
+    dmReplyTimer.current = setTimeout(() => {
       const reply = cannedReplies[Math.floor(Math.random() * cannedReplies.length)];
       dispatch(receiveReply({ convId, text: reply, id: uid(), at: Date.now() }));
       dispatch(setTyping(null));

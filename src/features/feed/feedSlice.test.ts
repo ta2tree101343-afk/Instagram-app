@@ -1,4 +1,4 @@
-import feedReducer, { like, save, comment, create, setOpenId, hydrateFeed } from "./feedSlice";
+import feedReducer, { like, save, comment, create, setOpenId, hydrateFeed, feedSlice } from "./feedSlice";
 import type { Post } from "@/shared/types";
 
 const basePost: Post = {
@@ -58,5 +58,16 @@ describe("feedSlice", () => {
     const state = { posts: [basePost], openId: null };
     const next = feedReducer(state, hydrateFeed([]));
     expect(next.posts).toHaveLength(0);
+  });
+
+  it("unlike on post with 0 likes does not go below 0", () => {
+    const state = {
+      posts: [{ id: "p1", likes: 0, liked: true, saved: false, inFeed: true, mine: false,
+                user: { username: "u", avatar: "", verified: false }, image: "", fallback: "",
+                caption: "", createdAt: 0, comments: [] }],
+      openId: null,
+    };
+    const next = feedSlice.reducer(state, like({ id: "p1", liked: false }));
+    expect(next.posts[0].likes).toBe(0);
   });
 });

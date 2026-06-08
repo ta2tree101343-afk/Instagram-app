@@ -1,4 +1,4 @@
-import messagesReducer, { openConv, sendMessage, receiveReply, setTyping, hydrateMessages } from "./messagesSlice";
+import messagesReducer, { openConv, sendMessage, receiveReply, setTyping, hydrateMessages, messagesSlice } from "./messagesSlice";
 import type { Conversation } from "@/shared/types";
 
 const baseConv: Conversation = {
@@ -72,5 +72,20 @@ describe("messagesSlice", () => {
     const next = messagesReducer(state, hydrateMessages([newConv]));
     expect(next.conversations).toHaveLength(1);
     expect(next.conversations[0].id).toBe("c2");
+  });
+
+  it("receiveReply does not modify unread count", () => {
+    const state = {
+      conversations: [{
+        id: "c1", unread: 2, online: false,
+        user: { username: "u", avatar: "", verified: false },
+        messages: [{ id: "m0", fromMe: false, text: "hi", at: 0 }],
+      }],
+      activeId: null,
+      typingConv: null,
+    };
+    const next = messagesSlice.reducer(state, receiveReply({ convId: "c1", text: "reply", id: "m1", at: 1 }));
+    expect(next.conversations[0].unread).toBe(2);
+    expect(next.conversations[0].messages).toHaveLength(2);
   });
 });

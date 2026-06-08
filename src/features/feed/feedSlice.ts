@@ -19,7 +19,10 @@ export const feedSlice = createSlice({
   reducers: {
     like(state, action: PayloadAction<{ id: string; liked: boolean }>) {
       const p = state.posts.find((p) => p.id === action.payload.id);
-      if (p) { p.likes += action.payload.liked ? 1 : -1; p.liked = action.payload.liked; }
+      if (p) {
+        p.likes = action.payload.liked ? p.likes + 1 : Math.max(0, p.likes - 1);
+        p.liked = action.payload.liked;
+      }
     },
     save(state, action: PayloadAction<{ id: string; saved: boolean }>) {
       const p = state.posts.find((p) => p.id === action.payload.id);

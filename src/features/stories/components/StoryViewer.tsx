@@ -17,9 +17,12 @@ export function StoryViewer({ stories, index, onClose, onSeen }: StoryViewerProp
 
   useEffect(() => {
     onSeen(stories[i].username);
-    timer.current = setTimeout(() => next(), 5000);
+    timer.current = setTimeout(() => {
+      if (i < stories.length - 1) setI(i + 1);
+      else onClose();
+    }, 5000);
     return () => { if (timer.current) clearTimeout(timer.current); };
-  }, [i]);
+  }, [i, onSeen, stories, onClose]);
 
   const next = () => { if (i < stories.length - 1) setI(i + 1); else onClose(); };
   const prev = () => { if (i > 0) setI(i - 1); };
