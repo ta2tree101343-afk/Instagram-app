@@ -26,7 +26,8 @@ export function VideoBox({ src, poster, onDoubleClick }: VideoBoxProps) {
   return (
     <>
       <video ref={ref} src={src} poster={poster} autoPlay loop muted playsInline
-        className="post-vid" onDoubleClick={onDoubleClick} />
+        className="post-vid" onDoubleClick={onDoubleClick}
+        onError={(e) => console.error("[VideoBox] video error", e.nativeEvent)} />
       <button className="vid-mute" onClick={(e) => { e.stopPropagation(); setMuted((m) => !m); }}>
         {muted ? <VolumeX size={15} /> : <Volume2 size={15} />}
       </button>

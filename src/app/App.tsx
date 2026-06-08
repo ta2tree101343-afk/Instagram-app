@@ -43,13 +43,6 @@ export default function App() {
   const dmReplyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    const l = document.createElement("link");
-    l.rel = "stylesheet";
-    l.href = "https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Grand+Hotel&display=swap";
-    document.head.appendChild(l);
-  }, []);
-
-  useEffect(() => {
     (async () => {
       try {
         const saved = await loadState();

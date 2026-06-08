@@ -21,7 +21,7 @@ export function Media({ src, fallback, alt = "", className, style, onClick, onDo
   }
   return (
     <img src={src} alt={alt} className={className} style={style}
-      loading="lazy" onError={() => setErr(true)}
+      loading="lazy" onError={(e) => { console.warn("[Media] image failed to load", src, e.nativeEvent); setErr(true); }}
       onClick={onClick} onDoubleClick={onDoubleClick} />
   );
 }

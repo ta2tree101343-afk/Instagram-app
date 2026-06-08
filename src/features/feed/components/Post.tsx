@@ -29,7 +29,14 @@ export function Post({ p, onLike, onSave, onComment, onOpen, onToast }: PostProp
         <div style={{ flex: 1 }} />
         <button className="iconbtn" onClick={() => onToast("オプションは準備中です")}><MoreHorizontal size={20} /></button>
       </div>
-      <div className="post-img-wrap" onDoubleClick={dbl} style={{ cursor: "pointer" }}>
+      <div
+        className="post-img-wrap"
+        onDoubleClick={dbl}
+        onKeyDown={(e) => e.key === "Enter" && dbl()}
+        role="button"
+        tabIndex={0}
+        style={{ cursor: "pointer" }}
+      >
         {p.video
           ? <VideoBox src={p.video} poster={p.image} />
           : <Media src={p.image} fallback={p.fallback} onClick={() => onOpen(p.id)} />}

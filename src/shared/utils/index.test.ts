@@ -49,3 +49,21 @@ describe("USE_REAL_MEDIA", () => {
     expect(typeof USE_REAL_MEDIA).toBe("boolean");
   });
 });
+
+describe("ago boundary values", () => {
+  it("returns たった今 at exactly 59s", () => {
+    expect(ago(Date.now() - 59_000)).toBe("たった今");
+  });
+  it("returns minutes at exactly 60s", () => {
+    expect(ago(Date.now() - 60_000)).toMatch(/分/);
+  });
+  it("returns hours at exactly 60min", () => {
+    expect(ago(Date.now() - 60 * 60_000)).toMatch(/時間/);
+  });
+  it("returns days at exactly 24h", () => {
+    expect(ago(Date.now() - 24 * 60 * 60_000)).toMatch(/日/);
+  });
+  it("returns weeks at exactly 7 days", () => {
+    expect(ago(Date.now() - 7 * 24 * 60 * 60_000)).toMatch(/週間/);
+  });
+});

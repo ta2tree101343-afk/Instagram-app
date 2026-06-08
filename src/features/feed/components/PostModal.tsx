@@ -3,7 +3,7 @@ import { useState } from "react";
 import { X, Heart, Send, Bookmark, Smile, BadgeCheck } from "lucide-react";
 import type { Post } from "@/shared/types";
 import { Media } from "@/shared/components/media";
-import { fmt, ago, gradCss, USE_REAL_MEDIA } from "@/shared/utils";
+import { fmt, ago, gradCss, USE_REAL_MEDIA, svgAvatar, hue } from "@/shared/utils";
 
 interface PostModalProps {
   p: Post;
@@ -40,7 +40,7 @@ export function PostModal({ p, onClose, onLike, onSave, onComment, onToast }: Po
             </div>
             {p.comments.map((c) => (
               <div className="cm-row" key={c.id}>
-                <img src={`https://i.pravatar.cc/100?u=${c.user}`} alt="" />
+                <img src={svgAvatar(hue(c.user))} alt="" />
                 <div><b>{c.user}</b> {c.text}</div>
               </div>
             ))}
